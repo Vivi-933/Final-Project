@@ -21,7 +21,7 @@ library(quantmod)
 ```{r salaries}
 salaries <- read.csv('ds_salaries.csv')
 z = getFX("USD/CAD", from = Sys.Date() - 1, to = Sys.Date())
-rate <- USDCAD$
+rate <- as.numeric(USDCAD$USD.CAD[1])
 salaries_CAD <- salaries|>
   mutate(salary_in_usd = as.integer(salary_in_usd * rate))|>
   rename(salary_in_CAD = salary_in_usd) 
