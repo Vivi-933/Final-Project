@@ -47,16 +47,31 @@ by_experience<-salaries_CAD|>
   group_by(experience_level)|>
   mutate(average = mean(salary_in_CAD))|>
   select(experience_level, average)|>
-  unique()|>
-  arrange()
+  unique()
 
 by_year_and_ex<-salaries_CAD|>
   group_by(experience_level, work_year)|>
   mutate(average = mean(salary_in_CAD))|>
   select(experience_level, work_year, average)|>
+  mutate(average = average/1000, average = round(average, 1))|>
   unique()|>
-  arrange(experience_level, work_year)
+  mutate(ex_year = paste(work_year, experience_level, sep = "_"))|>
+  arrange(work_year,experience_level)
+
+by_year_and_ex$experience_level <- factor(by_year_and_ex$experience_level, levels = c('EN', 'MI', 'SE', 'EX'))
+
+by_residence<-salaries_CAD|>
+  group_by(employee_residence)|>
+  mutate(residence_average = mean(salary_in_CAD))|>
+  select(employee_residence, residence_average)|>
+  unique()
+
 
 ```
 
-
+```{r}
+ggplot(by_year_and_ex)+
+    geom_col(mapping = aes(x = ex_year, y = average, fill = experience_level), colour = 'black')+
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+    labs(y = 'average(k)')
+```
