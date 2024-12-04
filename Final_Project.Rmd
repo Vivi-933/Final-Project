@@ -99,7 +99,10 @@ ggplot(grapes, mapping = aes(y = sugar_content_brix, x = berry_size_mm))+
 ```
 
 ```{r}
-scatter<-scatterplot3d(x = grapes$berry_size_mm, y = grapes$sugar_content_brix, z = grapes$quality_score)
-fit <- lm(grapes$quality_score~grapes$berry_size_mm+grapes$sugar_content_brix)
-scatter$plane3d(fit)
+if (interactive()) {
+    # You do *not* usually need to do this sort of thing
+    library(rgl) # need install.packages("rgl"), still might fail
+    plot3d(x = grapes$sugar_content_brix, y = grapes$sun_exposure_hours, z = grapes$quality_score)
+
+}
 ```
