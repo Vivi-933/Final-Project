@@ -66,10 +66,9 @@ grapes_split <- initial_validation_split(grapes, prop = c(0.6, 0.2))
 set.seed(1000)
 
 grapes_train <- training(grapes_split)
-
-grapes_valid <- vadilation(grapes_split)
-
+grapes_valid <- validation(grapes_split)
 grapes_test <- testing(grapes_split)
 
-
 ```
+
+# Exploratory Plot 1/Table 1 (only using 2 or more features, not the target variable)
