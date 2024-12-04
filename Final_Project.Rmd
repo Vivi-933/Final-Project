@@ -15,6 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(knitr)
 library(scatterplot3d)
+library(corrr)
 ```
 
 ```{r import}
@@ -70,15 +71,35 @@ cor to quality sugar: 0.6900412 acidity: 0.004675939 cluster_weight: -0.00467254
 
 ```{r}
 
-grapes |> 
+'grapes |> 
   correlate() |> 
   focus(sugar_content_brix)
 
 grapes |> 
   correlate() |> 
-  focus(sugar_content_brix)
+  focus(sugar_content_brix)'
 
+
+  continuous_vars <- sapply(grapes, is.numeric)
+  continuous_columns <- names(grapes)[continuous_vars]
+  continuous_columns
 ```
+
+
+```{r}
+generate_correlation_table <- function(data) {
+  continuous_vars <- data %>% select_if(is.numeric)
+  correlation_matrix <- cor(continuous_vars, use = "complete.obs") 
+  correlation_table <- as.data.frame(correlation_matrix) 
+  return(correlation_table) }
+
+grapes_woqs<-grapes|>
+  select(!(quality_score))
+corrs <- generate_correlation_table(grapes_woqs)
+corrs
+```
+
+
 
 ```{r}
 grapes_split <- initial_validation_split(grapes, prop = c(0.6, 0.2))
