@@ -58,7 +58,15 @@ percentile_by_region<-grapes|>
 cor(grapes$harvest_week, grapes$quality_score)
 ```
 
-cor to quality sugar: 0.6900412 acidity: 0.004675939 cluster_weight: -0.004672546 berry_size: 0.4783609 sun: 0.5426107 soil: 0.04112437 rain: 0.02780617 week: -0.03863471
+cor to quality 
+sugar: 0.6900412 
+acidity: 0.004675939
+cluster_weight: -0.004672546 
+berry_size: 0.4783609 
+sun: 0.5426107 
+soil: 0.04112437 
+rain: 0.02780617 
+week: -0.03863471
 
 ```{r}
 grapes_split <- initial_validation_split(grapes, prop = c(0.6, 0.2))
@@ -72,3 +80,9 @@ grapes_test <- testing(grapes_split)
 ```
 
 # Exploratory Plot 1/Table 1 (only using 2 or more features, not the target variable)
+```{r}
+ggplot(grapes, mapping = aes(x = sugar_content_brix, y = quality_score))+
+  geom_point(mapping = aes(colour = region))+
+  facet_wrap(~region)+
+  geom_smooth(method = 'lm', formula = 'y~x')
+```
