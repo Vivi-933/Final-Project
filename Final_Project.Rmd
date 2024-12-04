@@ -14,6 +14,7 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(knitr)
+library(scatterplot3d)
 ```
 
 ```{r import}
@@ -58,6 +59,7 @@ percentile_by_region<-grapes|>
 cor(grapes$harvest_week, grapes$quality_score)
 ```
 
+
 cor to quality 
 sugar: 0.6900412 
 acidity: 0.004675939
@@ -67,6 +69,7 @@ sun: 0.5426107
 soil: 0.04112437 
 rain: 0.02780617 
 week: -0.03863471
+
 
 ```{r}
 grapes_split <- initial_validation_split(grapes, prop = c(0.6, 0.2))
@@ -81,8 +84,16 @@ grapes_test <- testing(grapes_split)
 
 # Exploratory Plot 1/Table 1 (only using 2 or more features, not the target variable)
 ```{r}
-ggplot(grapes, mapping = aes(x = sugar_content_brix, y = quality_score))+
-  geom_point(mapping = aes(colour = region))+
+ggplot(grapes, mapping = aes(x = sun_exposure_hours, y = acidity_ph))+
+  geom_point(mapping = aes(colour = variety))+
   facet_wrap(~region)+
   geom_smooth(method = 'lm', formula = 'y~x')
 ```
+
+```{r}
+scatter<-scatterplot3d(x = grapes$berry_size_mm, y = grapes$sugar_content_brix, z = grapes$quality_score)
+fit <- lm(grapes$quality_score~grapes$berry_size_mm+grapes$sugar_content_brix)
+scatter$plane3d(fit)
+```
+
+
