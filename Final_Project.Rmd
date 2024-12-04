@@ -17,3 +17,44 @@ library(tidyverse)
 library(knitr)
 ```
 
+```{r import}
+grapes_0<-read_csv('GRAPE_QUALITY.csv')
+```
+
+```{r data_cleaning}
+grapes<-grapes_0|>
+  select(!(sample_id))
+grapes$quality_category<-factor(grapes$quality_category, levels = c('Low', 'Medium', 'High', 'Premium'))
+grapes<-grapes|>
+  mutate(wine_type = case_when(
+        variety == 'Riesling' ~ 'White',
+        variety == 'Pinot Noir' ~ 'Red',
+        variety == 'Sauvignon Blanc'~'White',
+        variety == 'Merlot'~'Red',
+        variety == 'Zinfandel'~'Red',
+        variety == 'Chardonnay'~'White',
+        variety == 'Syrah'~'Red',
+        variety == 'Cabernet Sauvignon'~'Red',
+        .default = variety
+      ),
+      harvest_week = as.integer(week(harvest_date)) - 30
+      )
+
+```
+
+```{r}
+percentile_by_region<-grapes|>
+  group_by(region)|>
+  mutate(r_count = n())|>
+  group_by(region, quality_category)|>
+  mutate(count = n(),
+         percent = (count/r_count) * 100,
+         percent = round(percent, 1))|>
+  select(region, quality_category, percent)|>
+  unique()|>
+  arrange(region, quality_category)|>
+  pivot_wider(names_from = quality_category, values_from = percent)
+  
+
+```
+
