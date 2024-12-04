@@ -39,7 +39,6 @@ grapes<-grapes|>
       ),
       harvest_week = as.integer(week(harvest_date)) - 30
       )
-
 ```
 
 ```{r}
@@ -54,7 +53,19 @@ percentile_by_region<-grapes|>
   unique()|>
   arrange(region, quality_category)|>
   pivot_wider(names_from = quality_category, values_from = percent)
-  
-
 ```
+
+```{r}
+cor(grapes$harvest_week, grapes$quality_score)
+```
+cor to quality
+sugar: 0.6900412
+acidity: 0.004675939
+cluster_weight: -0.004672546
+berry_size: 0.4783609
+sun: 0.5426107
+soil: 0.04112437
+rain: 0.02780617
+week: -0.03863471
+
 
