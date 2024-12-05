@@ -147,10 +147,10 @@ ggplot(grapes_train, aes(y = size_category, x = quality_score))+
 
 # Exploratory Linear Model 1: (only using 2 or more features, not the target variable)
 
-```{r grapes_recipe}
+```{r grape_recipe}
 #Using the training set: grapes_train
 # Predictor: Quality Score
-# Features: Continious(sugar_content_brix), Categorical(size_category)
+# Features: Continious(), Categorical(size_category)
 
 
 recipe_1 <- 
@@ -248,6 +248,104 @@ lm_versus_rf <- workflow_set(
     )
 
 lm_versus_rf |>
+    autoplot(select_best = TRUE, metric = "rmse") +
+    geom_label_repel(aes(label = wflow_id))
+
+```
+
+# Exploratory Linear Model 2: (only using 2 or more features, not the target variable)
+
+```{r grapes_recipe_2}
+#Using the training set: grapes_train
+# Predictor: Quality Score
+# Features: Continious(sun_exposure_hours), Categorical(region, variety)
+
+
+recipe_5 <- 
+  recipe(
+    quality_score ~ sun_exposure_hours + region + variety,
+    data = grapes_train
+  )|>
+  step_interact(~region) |>
+  step_interact(~variety)
+
+recipe_6 <- 
+  recipe(
+    quality_score ~ sun_exposure_hours + region,
+    data = grapes_train
+    ) |>
+  step_interact(~region)
+
+recipe_7 <- 
+  recipe(
+    quality_score ~ sun_exposure_hours + variety,
+    data = grapes_train
+    ) |>
+  step_interact(~variety) 
+
+
+
+grapes_recipe_2 <- 
+  list(
+    Sugar_variety_region = recipe_5,
+    Sugar_region = recipe_6, 
+    Sugar_variety = recipe_7)
+```
+
+```{r grapes_workflow_set_2}
+# Creating a work flow set for all recipes used on grapes_train
+grapes_workflow_set_2 <- 
+  workflow_set(grapes_recipe_2, models = list(lm = linear_reg()))
+```
+
+```{r grapes_fit_2}
+set.seed(1000)
+
+grapes_fit_2 <- workflow_set(
+  grapes_recipe_2,
+  models = list(lm = linear_reg())
+  ) |>
+  workflow_map(
+    fn = "tune_grid",
+    resamples = validation_set(grapes_split)
+    ) 
+  
+
+# Also plot the results for you to see.
+grapes_fit_2 |>
+    collect_metrics()|>
+    ggplot() +
+    aes(x = wflow_id, y = mean) +
+    geom_col(fill = "lightgrey", colour = "black") +
+    facet_wrap(~ .metric, scales = "free")+
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r lm_versus_rf}
+train_test <- initial_split(grapes, prop = 0.8)
+
+rf_2 <- rand_forest(trees = 1000, mtry = tune(), min_n = 3) |>
+    set_engine("randomForest") |>
+    set_mode("regression")
+
+tune_grid_2 <- tibble(mtry = 1:3)
+
+#rf
+
+lm_versus_rf_2 <- workflow_set(
+ grapes_recipe_2,
+  models = list(lm = linear_reg(), rf = rf)
+    
+) |>
+    workflow_map(
+        fn = "tune_grid",
+        grid = tune_grid_2,
+        seed = 100,
+        control = control_grid(save_pred = TRUE, save_workflow = TRUE),
+        resamples = vfold_cv(training(grapes_split), v = 5)
+    )
+
+lm_versus_rf_2 |>
     autoplot(select_best = TRUE, metric = "rmse") +
     geom_label_repel(aes(label = wflow_id))
 
