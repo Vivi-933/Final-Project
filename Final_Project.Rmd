@@ -99,7 +99,7 @@ kable(corrs)|>kable_styling()|>
 
 ```{r}
 ggplot(grapes, mapping = aes(y = sugar_content_brix, x = berry_size_mm))+
-  geom_point()
+  geom_point(color = "pink")
 ```
 
 ```{r}
