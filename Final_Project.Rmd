@@ -151,22 +151,32 @@ ggplot(grapes_train, aes(y = size_category, x = quality_score))+
 # Predictor: Quality Score
 # Features: Continious(sugar_content_brix), Categorical(size_category)
 
+
 recipe_1 <- 
+  recipe(
+    quality_score ~ sugar_content_brix + size_category + wine_type,
+    data = grapes_train
+  )|>
+  step_dummy(wine_type)|>
+  step_interact(~size_category)
+
+recipe_2 <- 
   recipe(
     quality_score ~ sugar_content_brix + size_category,
     data = grapes_train
     ) |>
   step_interact(~size_category)
 
-recipe_2 <- 
+recipe_3 <- 
   recipe(
     quality_score ~ sugar_content_brix + wine_type,
     data = grapes_train
     ) |>
   step_dummy(wine_type) 
 
+
 grapes_recipe <- 
-  list(Sugar_Size = recipe_1, Sugar_Type = recipe_2)
+  list(Sugar_Size_Type = recipe_1, Sugar_Size = recipe_2, Sugar_Type = recipe_3)
 ```
 
 ```{r grapes_workflow_set}
