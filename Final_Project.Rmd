@@ -17,6 +17,7 @@ library(knitr)
 library(scatterplot3d)
 library(corrr)
 library(kableExtra)
+library(ggridges)
 ```
 
 ```{r import}
@@ -44,6 +45,17 @@ grapes<-grapes|>
 ```
 
 ```{r}
+grapes_split <- initial_validation_split(grapes, prop = c(0.6, 0.2))
+
+set.seed(1000)
+
+grapes_train <- training(grapes_split)
+grapes_valid <- validation(grapes_split)
+grapes_test <- testing(grapes_split)
+
+```
+
+```{r}
 percentile_by_region<-grapes|>
   group_by(region)|>
   mutate(r_count = n())|>
@@ -57,35 +69,6 @@ percentile_by_region<-grapes|>
   pivot_wider(names_from = quality_category, values_from = percent)
 ```
 
-```{r}
-cor(grapes$sugar_content_brix, grapes$acidity_ph)
-cor(grapes$sugar_content_brix, grapes$cluster_weight_g)
-cor(grapes$sugar_content_brix, grapes$berry_size_mm)
-cor(grapes$sugar_content_brix, grapes$sun_exposure_hours)
-cor(grapes$sugar_content_brix, grapes$soil_moisture_percent)
-cor(grapes$rainfall_mm, grapes$soil_moisture_percent)
-cor(grapes$sugar_content_brix, grapes$rainfall_mm)
-cor(grapes$sugar_content_brix, grapes$harvest_week)
-```
-
-cor to quality sugar: 0.6900412 acidity: 0.004675939 cluster_weight: -0.004672546 berry_size: 0.4783609 sun: 0.5426107 soil: 0.04112437 rain: 0.02780617 week: -0.03863471
-
-```{r}
-
-'grapes |> 
-  correlate() |> 
-  focus(sugar_content_brix)
-
-grapes |> 
-  correlate() |> 
-  focus(sugar_content_brix)'
-
-
-  continuous_vars <- sapply(grapes, is.numeric)
-  continuous_columns <- names(grapes)[continuous_vars]
-  continuous_columns
-```
-
 
 ```{r}
 generate_correlation_table <- function(data) {
@@ -94,12 +77,13 @@ generate_correlation_table <- function(data) {
   correlation_table <- as.data.frame(correlation_matrix) 
   return(correlation_table) }
 
-grapes_woqs<-grapes|>
+grapes_woqs<-grapes_train|>
   select(!(quality_score))
 
 round_table <- function(data, digits = 1) { data %>% mutate(across(everything(), ~ round(.x, digits))) }
 corrs <- generate_correlation_table(grapes_woqs)
 corrs <- round_table(corrs, 4)
+
 kable(corrs)|>kable_styling()|>
   column_spec(1, width = '30em', background = 'palevioletred')|>
   column_spec(c(2,4,6, 8), width = "30em", background = "aquamarine")|>
@@ -110,16 +94,6 @@ kable(corrs)|>kable_styling()|>
 
 
 
-```{r}
-grapes_split <- initial_validation_split(grapes, prop = c(0.6, 0.2))
-
-set.seed(1000)
-
-grapes_train <- training(grapes_split)
-grapes_valid <- validation(grapes_split)
-grapes_test <- testing(grapes_split)
-
-```
 
 # Exploratory Plot 1/Table 1 (only using 2 or more features, not the target variable)
 
