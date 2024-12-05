@@ -87,11 +87,11 @@ generate_correlation_table <- function(data) {
   correlation_table <- as.data.frame(correlation_matrix) 
   return(correlation_table) }
 
-grapes_woqs<-grapes|>
+grapes_woqs<-grapes_train|>
   select(!(quality_score))
 
 round_table <- function(data, digits = 1) { data %>% mutate(across(everything(), ~ round(.x, digits))) }
-corrs <- generate_correlation_table(grapes)
+corrs <- generate_correlation_table(grapes_woqs)
 corrs <- round_table(corrs, 4)
 
 kable(corrs)|> kable_styling()|>
