@@ -45,10 +45,6 @@ grapes<-grapes|>
       ),
       harvest_week = as.integer(week(harvest_date)) - 30
       )
-```
-
-```{r}
-
 # Convert berry size into a categorical values
 grapes<-grapes|>
   mutate(size_category = case_when(
@@ -59,7 +55,7 @@ grapes<-grapes|>
         ))
 ```
 
-```{r}
+```{r training setup}
 grapes_split <- initial_validation_split(grapes, prop = c(0.6, 0.2))
 
 set.seed(1000)
@@ -70,7 +66,7 @@ grapes_test <- testing(grapes_split)
 
 ```
 
-```{r}
+```{r precentile by region}
 percentile_by_region<-grapes|>
   group_by(region)|>
   mutate(r_count = n())|>
@@ -84,7 +80,7 @@ percentile_by_region<-grapes|>
   pivot_wider(names_from = quality_category, values_from = percent)
 ```
 
-```{r fig.height = 6, fig.width = 12}
+```{r correlation table fig.height = 6, fig.width = 12}
 generate_correlation_table <- function(data) {
   continuous_vars <- data %>% select_if(is.numeric)
   correlation_matrix <- cor(continuous_vars, use = "complete.obs") 
@@ -108,7 +104,7 @@ kable(corrs)|> kable_styling()|>
 
 # Exploratory Plot 1/Table 1 (only using 2 or more features, not the target variable)
 
-```{r}
+```{r sugar by region}
 ggplot(grapes_train)+
   geom_density(mapping = aes(x = sugar_content_brix, fill = variety), alpha = 0.5, show.legend = FALSE)+
   facet_wrap(~variety)+
@@ -119,7 +115,7 @@ ggplot(grapes_train)+
        caption = 'Source: see footnote [1^]')
 ```
 
-```{r}
+```{r quality vs. sugar}
 ggplot(grapes_train,mapping=aes(x = sugar_content_brix, y = quality_score))+
   geom_point(mapping = aes(colour = sun_exposure_hours))+
   geom_smooth(method = 'lm', formula = 'y~x', se = FALSE)+
@@ -136,7 +132,7 @@ ggplot(grapes_train,mapping=aes(x = sugar_content_brix, y = quality_score))+
 
 # Model Plot 2: (only using 2 or more features, not the target variable)
 
-```{r}
+```{r violin plot}
 ggplot(grapes_train, aes(y = size_category, x = quality_score))+
   geom_violin(aes(fill = size_category))+
   labs(title = 'Size Category Vs. Quality Score',
