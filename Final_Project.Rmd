@@ -18,6 +18,8 @@ library(scatterplot3d)
 library(corrr)
 library(kableExtra)
 library(ggridges)
+library(arrow)
+library(tidymodels)
 ```
 
 ```{r import}
@@ -70,7 +72,7 @@ percentile_by_region<-grapes|>
 ```
 
 
-```{r}
+```{r fig.height = 6, fig.width = 12}
 generate_correlation_table <- function(data) {
   continuous_vars <- data %>% select_if(is.numeric)
   correlation_matrix <- cor(continuous_vars, use = "complete.obs") 
@@ -84,11 +86,11 @@ round_table <- function(data, digits = 1) { data %>% mutate(across(everything(),
 corrs <- generate_correlation_table(grapes_woqs)
 corrs <- round_table(corrs, 4)
 
-kable(corrs)|>kable_styling()|>
-  column_spec(1, width = '30em', background = 'palevioletred')|>
-  column_spec(c(2,4,6, 8), width = "30em", background = "aquamarine")|>
-  column_spec(c(3,5,7,9), width = '30em', background = 'rosybrown1')|>
-  row_spec(0, background = 'palevioletred')
+kable(corrs)|> kable_styling()|>
+  column_spec(1, background = rgb(0.878, 0.439, 0.49))|>
+  column_spec(c(2,4,6, 8), background = rgb(0.741, 0.949, 0.929))|>
+  column_spec(c(3,5,7,9), background = rgb(1, 0.827, 0.827))|>
+  row_spec(0, background = rgb(0.878, 0.439, 0.49))
 
 ```
 
@@ -97,14 +99,18 @@ kable(corrs)|>kable_styling()|>
 
 # Exploratory Plot 1/Table 1 (only using 2 or more features, not the target variable)
 
-```{r}
-ggplot(grapes, mapping = aes(y = sugar_content_brix, x = berry_size_mm))+
-  geom_point(color = "pink")
-```
+
 
 ```{r}
-if (interactive()) {
-    library(rgl) # need install.packages("rgl"), still might fail
-    plot3d(x = grapes$sugar_content_brix, y = grapes$sun_exposure_hours, z = grapes$quality_score)
-    }
+ggplot(grapes_train)+
+  geom_density(mapping = aes(x = sugar_content_brix, fill = variety), alpha = 0.5, show.legend = FALSE)+
+  facet_wrap(~variety)+
+  labs(y = 'Frequency',
+       x = 'Sugar Content',
+       title = 'Sugar Content by Variety',
+       subtitle = '1 Unit Sugar Content equal to 1g sugar per 100g of liquid',
+       caption = 'Source: see footnote [1^]')
 ```
+
+
+[1^] Vishal. (2024). Grape Quality [Data set]. Kaggle. https://doi.org/10.34740/KAGGLE/DSV/9781093
