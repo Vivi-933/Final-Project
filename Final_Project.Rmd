@@ -47,7 +47,6 @@ grapes<-grapes|>
       )
 ```
 
-
 ```{r}
 
 # Convert berry size into a categorical values
@@ -85,8 +84,6 @@ percentile_by_region<-grapes|>
   pivot_wider(names_from = quality_category, values_from = percent)
 ```
 
-
-
 ```{r fig.height = 6, fig.width = 12}
 generate_correlation_table <- function(data) {
   continuous_vars <- data %>% select_if(is.numeric)
@@ -109,12 +106,7 @@ kable(corrs)|> kable_styling()|>
 
 ```
 
-
-
-
 # Exploratory Plot 1/Table 1 (only using 2 or more features, not the target variable)
-
-
 
 ```{r}
 ggplot(grapes_train)+
@@ -126,6 +118,7 @@ ggplot(grapes_train)+
        subtitle = '1 Unit of Sugar Content equal to 1g sugar per 100g of liquid',
        caption = 'Source: see footnote [1^]')
 ```
+
 ```{r}
 ggplot(grapes_train,mapping=aes(x = sugar_content_brix, y = quality_score))+
   geom_point(mapping = aes(colour = sun_exposure_hours))+
@@ -140,8 +133,8 @@ ggplot(grapes_train,mapping=aes(x = sugar_content_brix, y = quality_score))+
        colour = 'Sun Exposure Hours')
 
 ```
-# Model Plot 2: (only using 2 or more features, not the target variable)
 
+# Model Plot 2: (only using 2 or more features, not the target variable)
 
 ```{r}
 ggplot(grapes_train, aes(y = size_category, x = quality_score))+
@@ -152,5 +145,57 @@ ggplot(grapes_train, aes(y = size_category, x = quality_score))+
        y = 'Size Category')
 ```
 
+# Exploratory Linear Model 1: (only using 2 or more features, not the target variable)
 
-^[Vishal. (2024). Grape Quality [Data set]. Kaggle. https://doi.org/10.34740/KAGGLE/DSV/9781093] 
+```{r grapes_recipe}
+#Using the training set: grapes_train
+# Predictor: Quality Score
+# Features: Continious(sugar_content_brix), Categorical(size_category)
+
+recipe_1 <- 
+  recipe(
+    quality_score ~ sugar_content_brix + size_category,
+    data = grapes_train
+    ) |>
+  step_interact(~size_category)
+
+recipe_2 <- 
+  recipe(
+    quality_score ~ sugar_content_brix + wine_type,
+    data = grapes_train
+    ) |>
+  step_dummy(wine_type) 
+
+grapes_recipe <- 
+  list(Sugar_Size = recipe_1, Sugar_Type = recipe_2)
+```
+
+```{r grapes_workflow_set}
+# Creating a work flow set for all recipes used on grapes_train
+grapes_workflow_set <- 
+  workflow_set(grapes_recipe, models = list(lm = linear_reg()))
+```
+
+```{r grapes_fit}
+
+set.seed(1000)
+
+grapes_fit <- workflow_set(
+  grapes_recipe,
+  models = list(lm = linear_reg())
+  ) |>
+  workflow_map(
+    fn = "tune_grid",
+    resamples = validation_set(grapes_split)
+    ) 
+  
+grapes_fit
+
+# Also plot the results for you to see.
+grapes_fit |>
+    collect_metrics()|>
+    ggplot() +
+    aes(x = wflow_id, y = mean) +
+    geom_col(fill = "lightgrey", colour = "black") +
+    facet_wrap(~ .metric, scales = "free")
+```
