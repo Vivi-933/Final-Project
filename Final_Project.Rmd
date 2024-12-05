@@ -47,6 +47,19 @@ grapes<-grapes|>
       )
 ```
 
+
+```{r}
+
+# Convert berry size into a categorical values
+grapes<-grapes|>
+  mutate(size_category = case_when(
+        berry_size_mm < 15 ~ 'small',
+        berry_size_mm < 20 ~ 'medium',
+        berry_size_mm < 25 ~ 'large',
+        .default = 'uncategorized'
+        ))
+```
+
 ```{r}
 grapes_split <- initial_validation_split(grapes, prop = c(0.6, 0.2))
 
@@ -71,6 +84,7 @@ percentile_by_region<-grapes|>
   arrange(region, quality_category)|>
   pivot_wider(names_from = quality_category, values_from = percent)
 ```
+
 
 
 ```{r fig.height = 6, fig.width = 12}
@@ -113,7 +127,6 @@ ggplot(grapes_train)+
        caption = 'Source: see footnote [1^]')
 ```
 ```{r}
-legend_title<-'title'
 ggplot(grapes_train,mapping=aes(x = sugar_content_brix, y = quality_score))+
   geom_point(mapping = aes(colour = sun_exposure_hours))+
   geom_smooth(method = 'lm', formula = 'y~x', se = FALSE)+
@@ -131,9 +144,9 @@ ggplot(grapes_train,mapping=aes(x = sugar_content_brix, y = quality_score))+
 
 
 ```{r}
-
-
-
-
+ggplot(grapes_train, aes(y = size_category, x = quality_score))+
+  geom_violin(aes(fill = size_category))
 ```
+
+
 [1^] Vishal. (2024). Grape Quality [Data set]. Kaggle. https://doi.org/10.34740/KAGGLE/DSV/9781093
