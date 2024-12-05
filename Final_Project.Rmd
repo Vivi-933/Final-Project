@@ -16,6 +16,7 @@ library(tidyverse)
 library(knitr)
 library(scatterplot3d)
 library(corrr)
+library(kableExtra)
 ```
 
 ```{r import}
@@ -95,8 +96,16 @@ generate_correlation_table <- function(data) {
 
 grapes_woqs<-grapes|>
   select(!(quality_score))
+
+round_table <- function(data, digits = 1) { data %>% mutate(across(everything(), ~ round(.x, digits))) }
 corrs <- generate_correlation_table(grapes_woqs)
-corrs
+corrs <- round_table(corrs, 4)
+kable(corrs)|>kable_styling()|>
+  column_spec(1, width = '30em', background = 'palevioletred')|>
+  column_spec(c(2,4,6, 8), width = "30em", background = "aquamarine")|>
+  column_spec(c(3,5,7,9), width = '30em', background = 'rosybrown1')|>
+  row_spec(0, background = 'palevioletred')
+
 ```
 
 
@@ -121,9 +130,7 @@ ggplot(grapes, mapping = aes(y = sugar_content_brix, x = berry_size_mm))+
 
 ```{r}
 if (interactive()) {
-    # You do *not* usually need to do this sort of thing
     library(rgl) # need install.packages("rgl"), still might fail
     plot3d(x = grapes$sugar_content_brix, y = grapes$sun_exposure_hours, z = grapes$quality_score)
-
-}
+    }
 ```
