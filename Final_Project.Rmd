@@ -55,7 +55,7 @@ grapes<-grapes|>
   mutate(size_category = case_when(
         berry_size_mm < 15 ~ 'small',
         berry_size_mm < 20 ~ 'medium',
-        berry_size_mm < 25 ~ 'large',
+        berry_size_mm >= 20 ~ 'large',
         .default = 'uncategorized'
         ))
 ```
@@ -103,7 +103,7 @@ corrs <- round_table(corrs, 4)
 
 kable(corrs)|> kable_styling()|>
   column_spec(1, background = rgb(0.878, 0.439, 0.49))|>
-  column_spec(c(2,4,6, 8), background = rgb(0.741, 0.949, 0.929))|>
+  column_spec(c(2,4,6,8), background = rgb(0.741, 0.949, 0.929))|>
   column_spec(c(3,5,7,9), background = rgb(1, 0.827, 0.827))|>
   row_spec(0, background = rgb(0.878, 0.439, 0.49))
 
@@ -145,8 +145,12 @@ ggplot(grapes_train,mapping=aes(x = sugar_content_brix, y = quality_score))+
 
 ```{r}
 ggplot(grapes_train, aes(y = size_category, x = quality_score))+
-  geom_violin(aes(fill = size_category))
+  geom_violin(aes(fill = size_category))+
+  labs(title = 'Size Category Vs. Quality Score',
+       subtitle = 'Small: 0-15mm, Medium: 15-20mm, Large: 20-25mm',
+       x = 'Quality Score',
+       y = 'Size Category')
 ```
 
 
-[1^] Vishal. (2024). Grape Quality [Data set]. Kaggle. https://doi.org/10.34740/KAGGLE/DSV/9781093
+^[Vishal. (2024). Grape Quality [Data set]. Kaggle. https://doi.org/10.34740/KAGGLE/DSV/9781093] 
