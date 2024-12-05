@@ -175,8 +175,21 @@ recipe_3 <-
   step_dummy(wine_type) 
 
 
+recipe_4 <- 
+  recipe(
+    quality_score ~ size_category + wine_type,
+    data = grapes_train
+  )|>
+  step_dummy(wine_type)|>
+  step_interact(~size_category)
+
+
 grapes_recipe <- 
-  list(Sugar_Size_Type = recipe_1, Sugar_Size = recipe_2, Sugar_Type = recipe_3)
+  list(
+    Sugar_Size_Type = recipe_1,
+    Sugar_Size = recipe_2, 
+    Sugar_Type = recipe_3,
+    Size_Type = recipe_4)
 ```
 
 ```{r grapes_workflow_set}
@@ -186,7 +199,6 @@ grapes_workflow_set <-
 ```
 
 ```{r grapes_fit}
-
 set.seed(1000)
 
 grapes_fit <- workflow_set(
@@ -207,4 +219,34 @@ grapes_fit |>
     aes(x = wflow_id, y = mean) +
     geom_col(fill = "lightgrey", colour = "black") +
     facet_wrap(~ .metric, scales = "free")
+```
+
+```{r lm_versus_rf}
+train_test <- initial_split(grapes, prop = 0.8)
+
+rf <- rand_forest(trees = 1000, mtry = tune(), min_n = 4) |>
+    set_engine("randomForest") |>
+    set_mode("regression")
+
+tune_grid <- tibble(mtry = 1:4)
+
+#rf
+
+lm_versus_rf <- workflow_set(
+ grapes_recipe,
+  models = list(lm = linear_reg(), rf = rf)
+    
+) |>
+    workflow_map(
+        fn = "tune_grid",
+        grid = tune_grid,
+        seed = 100,
+        control = control_grid(save_pred = TRUE, save_workflow = TRUE),
+        resamples = vfold_cv(training(grapes_split), v = 5)
+    )
+
+lm_versus_rf |>
+    autoplot(select_best = TRUE, metric = "rmse") +
+    geom_label_repel(aes(label = wflow_id))
+
 ```
