@@ -21,6 +21,7 @@ library(ggridges)
 library(arrow)
 library(tidymodels)
 library(viridis)
+library(ggrepel)
 ```
 
 ```{r import}
@@ -218,7 +219,8 @@ grapes_fit |>
     ggplot() +
     aes(x = wflow_id, y = mean) +
     geom_col(fill = "lightgrey", colour = "black") +
-    facet_wrap(~ .metric, scales = "free")
+    facet_wrap(~ .metric, scales = "free")+
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ```{r lm_versus_rf}
