@@ -53,6 +53,9 @@ grapes<-grapes|>
         berry_size_mm >= 20 ~ 'large',
         .default = 'uncategorized'
         ))
+
+grapes$size_category<-factor(grapes$size_category, levels = c('small', 'medium', 'large'))
+
 ```
 
 ```{r training setup}
@@ -117,7 +120,7 @@ ggplot(grapes_train)+
 
 ```{r quality vs. sugar}
 ggplot(grapes_train,mapping=aes(x = sugar_content_brix, y = quality_score))+
-  geom_point(mapping = aes(colour = sun_exposure_hours))+
+  geom_point(mapping = aes(colour = sun_exposure_hours), show.legend = FALSE)+
   geom_smooth(method = 'lm', formula = 'y~x', se = FALSE)+
   scale_color_viridis(option = "C") + 
   facet_wrap(~variety)+
