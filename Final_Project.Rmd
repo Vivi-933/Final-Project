@@ -147,10 +147,10 @@ ggplot(grapes_train, aes(y = size_category, x = quality_score))+
 
 # Exploratory Linear Model 1: (only using 2 or more features, not the target variable)
 
-```{r grapes_recipe}
+```{r grape_recipe}
 #Using the training set: grapes_train
 # Predictor: Quality Score
-# Features: Continious(sugar_content_brix), Categorical(size_category)
+# Features: Continious(), Categorical(size_category)
 
 
 recipe_1 <- 
@@ -251,4 +251,52 @@ lm_versus_rf |>
     autoplot(select_best = TRUE, metric = "rmse") +
     geom_label_repel(aes(label = wflow_id))
 
+```
+
+# Exploratory Linear Model 2: (only using 2 or more features, not the target variable)
+
+```{r grapes_recipe_2}
+#Using the training set: grapes_train
+# Predictor: Quality Score
+# Features: Continious(sun_exposure_hours), Categorical(region, variety)
+
+
+recipe_5 <- 
+  recipe(
+    quality_score ~ sun_exposure_hours + region + variety,
+    data = grapes_train
+  )|>
+  step_interact(~region) |>
+  step_interact(~variety)
+
+recipe_6 <- 
+  recipe(
+    quality_score ~ sun_exposure_hours + region,
+    data = grapes_train
+    ) |>
+  step_interact(~region)
+
+recipe_7 <- 
+  recipe(
+    quality_score ~ sun_exposure_hours + variety,
+    data = grapes_train
+    ) |>
+  step_interact(~variety) 
+
+
+recipe_8 <- 
+  recipe(
+    quality_score ~ region + variety,
+    data = grapes_train
+  )|>
+  step_interact(~region) |>
+  step_interact(~variety)
+
+
+grapes_recipe_2 <- 
+  list(
+    Sugar_variety_region = recipe_5,
+    Sugar_region = recipe_6, 
+    Sugar_variety = recipe_7,
+    region_variety = recipe_8)
 ```
