@@ -113,12 +113,27 @@ ggplot(grapes_train)+
        caption = 'Source: see footnote [1^]')
 ```
 ```{r}
+legend_title<-'title'
 ggplot(grapes_train,mapping=aes(x = sugar_content_brix, y = quality_score))+
   geom_point(mapping = aes(colour = sun_exposure_hours))+
-  geom_smooth(method = 'lm', formula = 'y~x')+
-  scale_color_viridis(option = "C") +
-  facet_wrap(~variety) 
+  geom_smooth(method = 'lm', formula = 'y~x', se = FALSE)+
+  scale_color_viridis(option = "C") + 
+  facet_wrap(~variety)+
+  labs(x = 'Sugar Content',
+       y = 'Quality Score',
+       title = 'Quality vs. Sugar Content',
+       subtitle = '1 Unit of Sugar Content equal to 1g sugar per 100g of liquid',
+       caption = "Source: see footnote [2^]",
+       colour = 'Sun Exposure Hours')
 
 ```
+# Model Plot 2: (only using 2 or more features, not the target variable)
 
+
+```{r}
+
+
+
+
+```
 [1^] Vishal. (2024). Grape Quality [Data set]. Kaggle. https://doi.org/10.34740/KAGGLE/DSV/9781093
