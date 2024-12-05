@@ -108,9 +108,15 @@ ggplot(grapes_train)+
   labs(y = 'Frequency',
        x = 'Sugar Content',
        title = 'Sugar Content by Variety',
-       subtitle = '1 Unit Sugar Content equal to 1g sugar per 100g of liquid',
+       subtitle = '1 Unit of Sugar Content equal to 1g sugar per 100g of liquid',
        caption = 'Source: see footnote [1^]')
 ```
+```{r}
+ggplot(grapes_train,mapping=aes(x = sugar_content_brix, y = quality_score))+
+  geom_point(mapping = aes(colour = quality_category))+
+  geom_smooth(method = 'lm', formula = 'y~x')+
+  facet_wrap(~variety)
 
+```
 
 [1^] Vishal. (2024). Grape Quality [Data set]. Kaggle. https://doi.org/10.34740/KAGGLE/DSV/9781093
