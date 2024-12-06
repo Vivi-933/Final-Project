@@ -30,6 +30,8 @@ library(patchwork)}))
 grapes_0<-read_csv('GRAPE_QUALITY.csv')
 ```
 
+# Data Cleaning:
+
 ```{r data_cleaning}
 grapes<-grapes_0|>
   select(!(sample_id))
@@ -54,6 +56,8 @@ grapes<-grapes|> mutate(size_category = case_when(
 grapes$size_category<-factor(grapes$size_category, levels = c('small', 'medium', 'large'))
 ```
 
+# Exploratory Table 1: Feature Correlation
+
 ```{r training setup}
 grapes_split <- initial_validation_split(grapes, prop = c(0.6, 0.2))
 grapes_train <- training(grapes_split)
@@ -67,7 +71,7 @@ generate_correlation_table <- function(data) {
   return(correlation_table) }
 grapes_woqs<-grapes_train|>select(!(quality_score))
 
-round_table <- function(data, digits = 1) { data %>% mutate(across(everything(),
+round_table <- function(data, digits = 1) {data %>% mutate(across(everything(),
                                                                    ~ round(.x, digits)))}
 corrs <- generate_correlation_table(grapes_woqs)
 corrs <- round_table(corrs, 4)
@@ -87,7 +91,7 @@ a
 b
 ```
 
-# Exploratory Plot 1/Table 1 (only using 2 or more features, not the target variable)
+# Exploratory Plot 2: Sugar Content by Variety
 
 ```{r, sugar by region}
 ggplot(grapes_train)+
@@ -101,12 +105,13 @@ ggplot(grapes_train)+
        caption = 'Source: see footnote 1')
 ```
 
+# Model Plot 2: Quality vs. Sugar Content
+
 ```{r, quality vs. sugar}
 ggplot(grapes_train,mapping=aes(x = sugar_content_brix, y = quality_score))+
   geom_point(mapping = aes(colour = sun_exposure_hours))+
   geom_smooth(method = 'lm', formula = 'y~x', se = FALSE)+
   scale_color_viridis(option = "C") + 
-  facet_wrap(~variety)+
   labs(x = 'Sugar Content',
        y = 'Quality Score',
        title = 'Quality vs. Sugar Content',
@@ -115,11 +120,12 @@ ggplot(grapes_train,mapping=aes(x = sugar_content_brix, y = quality_score))+
        colour = 'Sun Exposure Hours')
 ```
 
-# Model Plot 2: (only using 2 or more features, not the target variable)
+# Model Plot 2: Size Category Vs. Wine Type
 
 ```{r, violin plot}
 ggplot(grapes_train, aes(y = size_category, x = quality_score))+
-  geom_violin(aes(fill = size_category), show.legend=FALSE)+
+  geom_violin(aes(fill = size_category), alpha = 0.5 ,show.legend=FALSE)+
+  facet_wrap(~wine_type) +
   labs(title = 'Size Category Vs. Quality Score',
        subtitle = 'Small: 0-15mm, Medium: 15-20mm, Large: 20-25mm',
        x = 'Quality Score',
@@ -127,7 +133,7 @@ ggplot(grapes_train, aes(y = size_category, x = quality_score))+
        caption = 'Source: see footnote 1')
 ```
 
-# Exploratory Linear Model 1: (only using 2 or more features, not the target variable)
+# Exploratory Linear Model 2: 
 
 ```{r, grape_recipe}
 recipe1<-recipe(quality_score ~ sugar_content_brix + size_category + wine_type,
@@ -178,7 +184,7 @@ lm_versus_rf |>
     geom_label_repel(aes(label = wflow_id))
 ```
 
-# Exploratory Linear Model 2: (only using 2 or more features, not the target variable)
+# Exploratory Linear Model 2:
 
 ```{r, grapes_recipe_2}
 recipe5<-recipe(quality_score ~ sun_exposure_hours + region + variety,
@@ -187,8 +193,8 @@ recipe6<-recipe(quality_score ~ sun_exposure_hours + region,
                    data = grapes_train) |> step_interact(~region)
 recipe7<-recipe(quality_score ~ sun_exposure_hours + variety,
                    data = grapes_train) |>step_interact(~variety) 
-grapes_recipe_2 <- list(Sugar_variety_region = recipe5,
-                        Sugar_region = recipe6, Sugar_variety = recipe7)
+grapes_recipe_2 <- list(Sun_variety_region = recipe5,
+                        Sun_region = recipe6, Sun_variety = recipe7)
 ```
 
 ```{r grapes_workflow_set_2}
@@ -229,6 +235,8 @@ lm_versus_rf_2 |>
     autoplot(select_best = TRUE, metric = "rmse") +
     geom_label_repel(aes(label = wflow_id))
 ```
+
+# Final Model:
 
 ```{r best_model, error=TRUE}
 
@@ -274,7 +282,3 @@ bar<-bind_rows(
          x = 'Model')
 bar + point
 ```
-
-[^1]
-
-[^1]: Vishal. (2024). Grape Quality [Data set]. Kaggle. <https://doi.org/10.34740/KAGGLE/DSV/9781093>
