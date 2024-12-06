@@ -4,6 +4,7 @@ author: "Group 12"
 date: "December 1st, 2024"
 output: pdf_document
 ---
+
 -   Egbo Joseph (143037470)
 -   Goudy Joshua (169031329)
 -   Thambiaiah Melissa (169060509)
@@ -20,12 +21,15 @@ library(ggridges)
 library(arrow)
 library(tidymodels)
 library(viridis)
+library(kableExtra)
 library(ggrepel)
 library(patchwork)}))
 ```
+
 ```{r import}
 grapes_0<-read_csv('GRAPE_QUALITY.csv')
 ```
+
 ```{r data_cleaning}
 grapes<-grapes_0|>
   select(!(sample_id))
@@ -49,10 +53,12 @@ grapes<-grapes|> mutate(size_category = case_when(
         .default = 'uncategorized' ))
 grapes$size_category<-factor(grapes$size_category, levels = c('small', 'medium', 'large'))
 ```
+
 ```{r training setup}
 grapes_split <- initial_validation_split(grapes, prop = c(0.6, 0.2))
 grapes_train <- training(grapes_split)
 ```
+
 ```{r, correlation table}
 generate_correlation_table <- function(data) {
   continuous_vars <- data %>% select_if(is.numeric)
@@ -62,29 +68,27 @@ generate_correlation_table <- function(data) {
 grapes_woqs<-grapes_train|>select(!(quality_score))
 
 round_table <- function(data, digits = 1) { data %>% mutate(across(everything(),
-                                                                   ~ round(.x, digits))) }
+                                                                   ~ round(.x, digits)))}
 corrs <- generate_correlation_table(grapes_woqs)
 corrs <- round_table(corrs, 4)
 rownames(corrs)<-c('Sugar Content', 'Acidity(PH)', 'Cluster Weight(g)', 'Berry Size(mm)',
                    'Sun Hours', 'Soil Moisture (%)', 'Rainfal(mm)', 'Harvest Week')
 a<-kable(corrs[1:4], col.names=c('Sugar Content','Acidity(PH)', 'Cluster Weight(g)', 
-                                 'Berry Size(mm)'))|> kable_styling()|>
-  column_spec(1, width = '10em', background = rgb(0.878, 0.439, 0.49))|>
-  column_spec(c(2,4), width = '10em', background = rgb(0.741, 0.949, 0.929))|>
-  column_spec(c(3,5), width = '10em', background = rgb(1, 0.827, 0.827))|>
-  row_spec(0, background = rgb(0.878, 0.439, 0.49))
-b<-kable(corrs[4:7], col.names = c('Sun Hours','Soil Moisture(%)', 'Rainfal(mm)', 'harvest Week'
-))|> kable_styling()|>
-  column_spec(1, width = '10em', background = rgb(0.878, 0.439, 0.49))|>
-  column_spec(c(2,4), width = '10em', background = rgb(0.741, 0.949, 0.929))|>
-  column_spec(c(3,5), width = '10em', background = rgb(1, 0.827, 0.827))|>
-  row_spec(0, background = rgb(0.878, 0.439, 0.49))
+                                 'Berry Size(mm)'), booktabs = FALSE)|> kable_styling()|>
+  column_spec(1, width = '8em')|> column_spec(c(2,3,4,5), width = '5em')
+
+b<-kable(corrs[4:7], col.names = c('Sun Hours','Soil Moisture(%)', 'Rainfal(mm)', 
+                              'harvest Week'), booktabs = FALSE)|> kable_styling()|>
+  column_spec(1, width = '8em')|> column_spec(c(2,3,4,5), width = '5em')
 ```
+
 ```{r, echo=FALSE}
 a
 b
 ```
+
 # Exploratory Plot 1/Table 1 (only using 2 or more features, not the target variable)
+
 ```{r, sugar by region}
 ggplot(grapes_train)+
   geom_density(mapping = aes(x = sugar_content_brix, fill = variety), alpha = 0.5, 
@@ -110,7 +114,9 @@ ggplot(grapes_train,mapping=aes(x = sugar_content_brix, y = quality_score))+
        caption = 'Source: see footnote 1',
        colour = 'Sun Exposure Hours')
 ```
+
 # Model Plot 2: (only using 2 or more features, not the target variable)
+
 ```{r, violin plot}
 ggplot(grapes_train, aes(y = size_category, x = quality_score))+
   geom_violin(aes(fill = size_category), show.legend=FALSE)+
@@ -120,22 +126,26 @@ ggplot(grapes_train, aes(y = size_category, x = quality_score))+
        y = 'Size Category',
        caption = 'Source: see footnote 1')
 ```
+
 # Exploratory Linear Model 1: (only using 2 or more features, not the target variable)
+
 ```{r, grape_recipe}
-recipe_1 <- recipe(quality_score ~ sugar_content_brix + size_category + wine_type,
-                   data = grapes_train)|>step_dummy(wine_type)|>step_interact(~size_category)
-recipe_2 <- recipe(quality_score ~ sugar_content_brix + size_category,
-                   data = grapes_train) |>step_interact(~size_category)
-recipe_3 <- recipe(quality_score ~ sugar_content_brix + wine_type,
+recipe1<-recipe(quality_score ~ sugar_content_brix + size_category + wine_type,
+     data = grapes_train)|>step_dummy(wine_type)|>step_interact(~size_category)
+recipe2<-recipe(quality_score ~ sugar_content_brix + size_category,
+               data = grapes_train) |>step_interact(~size_category)
+recipe3<-recipe(quality_score ~ sugar_content_brix + wine_type,
                    data = grapes_train) |>step_dummy(wine_type) 
-recipe_4 <- recipe(quality_score ~ size_category + wine_type,
-                   data = grapes_train)|>step_dummy(wine_type)|>step_interact(~size_category)
-grapes_recipe <- list(Sugar_Size_Type = recipe_1,Sugar_Size = recipe_2, 
-                      Sugar_Type = recipe_3,Size_Type = recipe_4)
+recipe4<-recipe(quality_score ~ size_category + wine_type,
+  data = grapes_train)|>step_dummy(wine_type)|>step_interact(~size_category)
+grapes_recipe <- list(Sugar_Size_Type = recipe1,Sugar_Size = recipe2, 
+                      Sugar_Type = recipe3,Size_Type = recipe4)
 ```
+
 ```{r grapes_workflow_set}
 grapes_workflow_set <- workflow_set(grapes_recipe, models = list(lm = linear_reg()))
 ```
+
 ```{r, grapes_fit}
 set.seed(1000)
 grapes_fit <- workflow_set(
@@ -151,7 +161,7 @@ grapes_fit |>
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-```{r, warning=FALSE}
+```{r rf1, warning=FALSE}
 train_test <- initial_split(grapes, prop = 0.8)
 rf <- rand_forest(trees = 1000, mtry = tune(), min_n = 4) |>
     set_engine("randomForest") |>
@@ -167,20 +177,24 @@ lm_versus_rf |>
     autoplot(select_best = TRUE, metric = "rmse") +
     geom_label_repel(aes(label = wflow_id))
 ```
+
 # Exploratory Linear Model 2: (only using 2 or more features, not the target variable)
+
 ```{r, grapes_recipe_2}
-recipe_5 <- recipe(quality_score ~ sun_exposure_hours + region + variety,
+recipe5<-recipe(quality_score ~ sun_exposure_hours + region + variety,
                    data = grapes_train)|>step_interact(~region) |> step_interact(~variety)
-recipe_6 <- recipe(quality_score ~ sun_exposure_hours + region,
+recipe6<-recipe(quality_score ~ sun_exposure_hours + region,
                    data = grapes_train) |> step_interact(~region)
-recipe_7 <- recipe(quality_score ~ sun_exposure_hours + variety,
+recipe7<-recipe(quality_score ~ sun_exposure_hours + variety,
                    data = grapes_train) |>step_interact(~variety) 
-grapes_recipe_2 <- list(Sugar_variety_region = recipe_5,
-                        Sugar_region = recipe_6, Sugar_variety = recipe_7)
+grapes_recipe_2 <- list(Sugar_variety_region = recipe5,
+                        Sugar_region = recipe6, Sugar_variety = recipe7)
 ```
+
 ```{r grapes_workflow_set_2}
 grapes_workflow_set_2 <- workflow_set(grapes_recipe_2, models = list(lm = linear_reg()))
 ```
+
 ```{r, grapes_fit_2}
 set.seed(1000)
 grapes_fit_2 <- workflow_set(
@@ -196,7 +210,7 @@ grapes_fit_2 |>
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-```{r, warning=FALSE}
+```{r rf2, warning=FALSE}
 train_test <- initial_split(grapes, prop = 0.8)
 rf_2 <- rand_forest(trees = 1000, mtry = tune(), min_n = 3) |>
     set_engine("randomForest") |>
@@ -215,11 +229,13 @@ lm_versus_rf_2 |>
     autoplot(select_best = TRUE, metric = "rmse") +
     geom_label_repel(aes(label = wflow_id))
 ```
+
 ```{r best_model, error=TRUE}
 
 best_lm <- lm_versus_rf |>extract_workflow("Sugar_Size_lm")
 best_rf <- lm_versus_rf |>extract_workflow("Sugar_Size_rf")
 ```
+
 ```{r, test_fit}
 sslm<-lm_versus_rf|>extract_workflow_set_result('Sugar_Size_lm')|>
   select_best(metric='rmse')
@@ -258,4 +274,7 @@ bar<-bind_rows(
          x = 'Model')
 bar + point
 ```
-^[Vishal. (2024). Grape Quality [Data set]. Kaggle. https://doi.org/10.34740/KAGGLE/DSV/9781093]
+
+[^1]
+
+[^1]: Vishal. (2024). Grape Quality [Data set]. Kaggle. <https://doi.org/10.34740/KAGGLE/DSV/9781093>
