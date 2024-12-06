@@ -4,7 +4,6 @@ author: "Group 12"
 date: "December 1st, 2024"
 output: pdf_document
 ---
-
 -   Egbo Joseph (143037470)
 -   Goudy Joshua (169031329)
 -   Thambiaiah Melissa (169060509)
@@ -26,11 +25,20 @@ library(ggrepel)
 library(patchwork)}))
 ```
 
+# Abstract
+
+The fundamental purpose of this analysis is to determine what cultivation processes of grape cultivation in the ‘grapes’ dataset can maximize the grape quality. In order to achieve this purpose, the goals are as required; the creation of graphical and predictive models in order to fulfill the research question, “How effective is the specific factor’s contribution to the grape quality score?” 
+
+# Introduction
+
+The Italian Wine Grapes data set provides a comprehensive understanding of cultivation processes pertaining to grapes alongside the relationship that exists with the production of high-quality wine. With a focus on select regions across the heart of Italy, the ‘grapes’ data set captures the essence of varying elements associated with grape cultivation including, region variety, sugar content, quality score, rainfall, and sun exposure over the duration of two months. This report allows individuals to explore the intersections between agriculture, and economics while offering valuable insights into the optimal conditions that yield premium wines. The link between specific factors and their contributions to grape cultivation can be perceived by examining the trends and correlations that prevail from this study.
+
+
 ```{r import}
 grapes_0<-read_csv('GRAPE_QUALITY.csv')
 ```
 
-# Data Cleaning:
+## Data Cleaning:
 
 ```{r data_cleaning}
 grapes<-grapes_0|>
@@ -56,7 +64,9 @@ grapes<-grapes|> mutate(size_category = case_when(
 grapes$size_category<-factor(grapes$size_category, levels = c('small', 'medium', 'large'))
 ```
 
-# Exploratory Table 1: Feature Correlation
+In order to clean the data for the purpose of making it more comprehensible and effective for analysis, a variable was created to allow for the categorization of red versus white wine. Similarly, cleaning the data entailed the creation of a scale for berry sizes in an attempt to separate the grapes by size into three categories ranging from small, medium and large. Ultimately, the numerical values within the data were organized, corresponding to the relationship that exists between specific variables which possessed the most significant impact in contributing to the quality of the grape. 
+
+## Exploratory Table 1: Feature Correlation
 
 ```{r training setup}
 grapes_split <- initial_validation_split(grapes, prop = c(0.6, 0.2))
@@ -91,7 +101,9 @@ a
 b
 ```
 
-# Exploratory Plot 2: Sugar Content by Variety
+In the first step of analyzing the data, a table was created to effectively convey the correlation between every individual variable that does not play a role in dictating the quality of the grapes. The reasoning behind the use of correlation relates to the efficiency of determining the strength associated with the relationship between two variables. To build on this, we determine how much A (the target variable) changes concurrently when B (the feature variable) increases by 1, which is how correlation is defined. Conclusively, there is minimal correlation between variables and this is revealed through the variables possessing a generally weak link to each other. 
+
+## Exploratory Plot 2: Sugar Content by Variety
 
 ```{r, sugar by region}
 ggplot(grapes_train)+
@@ -105,7 +117,9 @@ ggplot(grapes_train)+
        caption = 'Source: see footnote 1')
 ```
 
-# Model Plot 2: Quality vs. Sugar Content
+In the second step of analyzing the data, the comparison was made between sugar content and the variety of grapes. Fundamentally, sugar is measured in brix, which is defined as one gram of sugar per one hundred gram of grape liquids. From the evident graphical representation of the frequency it is said that the variety of Riesling, Syrah and Zinfandel tend to reveal a comparatively higher sugar content, while varieties such as Merlot and Sauvignon act inversely. 
+
+## Model Plot 2: Quality vs. Sugar Content
 
 ```{r, quality vs. sugar}
 ggplot(grapes_train,mapping=aes(x = sugar_content_brix, y = quality_score))+
@@ -120,7 +134,9 @@ ggplot(grapes_train,mapping=aes(x = sugar_content_brix, y = quality_score))+
        colour = 'Sun Exposure Hours')
 ```
 
-# Model Plot 2: Size Category Vs. Wine Type
+Conducting further analysis between sugar content and sun exposure versus the target variable, that being sugar level. From the exploration of relation, it is conclusive that as sugar content in a grape increases, the quality score simultaneously increases. Additionally, as sunlight hours increase in the cultivation of grapes, the quality score is also inclined to increase as well. Apart from this, sugar content and sunlight hours present little to no correlation between one. 
+
+## Model Plot 2: Size Category Vs. Wine Type
 
 ```{r, violin plot}
 ggplot(grapes_train, aes(y = size_category, x = quality_score))+
@@ -133,7 +149,9 @@ ggplot(grapes_train, aes(y = size_category, x = quality_score))+
        caption = 'Source: see footnote 1')
 ```
 
-# Exploratory Linear Model 2: 
+In our final graphical exploration of the data, a comparison between the sugar content against the size of the grapes and the type of wine that the grapes are inclined to produce, is conducted. From the extraction of the data, we can derive that larger grapes tend to enhance the quality score of the grape, while red wine grapes have the tendency to be larger and higher in quality. On the contrary, white wine grapes are smaller on average, while remaining low in quality. 
+
+## Exploratory Linear Model 2: 
 
 ```{r, grape_recipe}
 recipe1<-recipe(quality_score ~ sugar_content_brix + size_category + wine_type,
@@ -184,7 +202,9 @@ lm_versus_rf |>
     geom_label_repel(aes(label = wflow_id))
 ```
 
-# Exploratory Linear Model 2:
+The initial predictive model uses the sugar content of the grapes, their respective size and the type of wine that the grapes are most likely to produce to determine the quality of the grapes. In the analysis, four variations of the features were used to identify which combination had the strongest effect on the overall quality of the grapes. From this, it can be determined that using all three features creates the best overall model, but the size of the grapes has a much greater influence on quality compared to the wine type.
+
+## Exploratory Linear Model 2:
 
 ```{r, grapes_recipe_2}
 recipe5<-recipe(quality_score ~ sun_exposure_hours + region + variety,
@@ -236,6 +256,8 @@ lm_versus_rf_2 |>
     geom_label_repel(aes(label = wflow_id))
 ```
 
+The secondary predictive model, instead uses the amount of sunlight the grapes receive, their respective region and the specific variety of grapes to determine the quality of the grapes. In the analysis, three variations of the features were used to identify which combination had the strongest effect on the overall quality of the grapes. From the secondary analysis, it can be determined that using the amount of sun exposure and variety creates the best overall model, indicating the region of grapes is not necessary in predicting the quality of the grapes.
+
 # Final Model:
 
 ```{r best_model, error=TRUE}
@@ -282,4 +304,14 @@ bar<-bind_rows(
          x = 'Model')
 bar + point
 ```
-[Vishal. (2024). Grape Quality [Data set]. Kaggle. <https://doi.org/10.34740/KAGGLE/DSV/9781093>]
+
+From the analysis preformed previously, the quality of grapes has a strong correlation to the sugar amount and the size of the grape. This can be seen in the rank of the model, the rsme value and the rsq value.
+
+# Conclusions
+
+Conclusively, this study proficiently presents the influence of grape cultivation measurements on the quality of grapes harvested from the heart of Italy. In the exploratory portion of the analysis, it was discovered that there exists a plausible link between sugar content, as well as variety and size, to the quality pertaining to the grapes. Furthermore, this correlation was expanded upon through the utilization of predictive models, the correlation metric, and the RMSE and RSQ of models. Building on this, the greatest correlation obtainable was the sugar content and size to the quality of grapes, identifiable in the final model. This can be logically perceived as these grapes are primarily used in the production of wine, in which comparatively sweeter wines can be extracted in great quantity from grapes that are larger in size and possess higher levels of sweetness. 
+
+The primary limitation corresponding to this data is associated with the noticeably short time periods within the data set from which the grapes were collected. Moreover, measurements such as pH, soil moisture, and rainfall were ineffectual as they possessed minimal correlation with one another and failed to contribute to the quality of wine grapes. Ultimately, this analysis offers valuable insights into the influential relationships that lie within the cultivation of grapes.
+
+
+^[Vishal. (2024). Grape Quality [Data set]. Kaggle. <https://doi.org/10.34740/KAGGLE/DSV/9781093>]
