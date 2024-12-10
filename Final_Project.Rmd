@@ -101,7 +101,7 @@ a
 b
 ```
 
-In the first step of analyzing the data, a table was created to effectively convey the correlation between every individual variable that does not play a role in dictating the quality of the grapes. The reasoning behind the use of correlation relates to the efficiency of determining the strength associated with the relationship between two variables. To build on this, we determine how much A (the target variable) changes concurrently when B (the feature variable) increases by 1, which is how correlation is defined. Conclusively, there is minimal correlation between variables and this is revealed through the variables possessing a generally weak link to each other.
+In the first step of analyzing the data, a table was created to effectively convey the correlation between every individual variable that does not play a role in dictating the quality of the grapes. The reasoning behind the use of correlation relates to the efficiency of determining the strength associated with the relationship between two variables. To build on this, we determine how much A (the target variable) changes concurrently when B (the feature variable) increases by 1, which is how correlation is defined. Conclusively, there is minimal correlation between variables and this is revealed through the variables possessing a generally small slope when ploteted against each other.
 
 ## Exploratory Plot 2: Sugar Content by Variety
 
@@ -117,7 +117,7 @@ ggplot(grapes_train)+
        caption = 'Source: see footnote 1')
 ```
 
-In the second step of analyzing the data, the comparison was made between sugar content and the variety of grapes. Fundamentally, sugar is measured in brix, which is defined as one gram of sugar per one hundred gram of grape liquids. From the evident graphical representation of the frequency it is said that the variety of Riesling, Syrah and Zinfandel tend to reveal a comparatively higher sugar content, while varieties such as Merlot and Sauvignon act inversely.
+In the second step of analyzing the data, the comparison was made between sugar content and the variety of grapes. Fundamentally, sugar is measured in brix, which is defined as one gram of sugar per one hundred grams of grape liquids. From the evident graphical representation of the frequency it is said that the variety of Riesling, Syrah and Zinfandel tend to reveal a comparatively higher sugar content, while varieties such as Merlot and Sauvignon act inversely.
 
 ## Model Plot 2: Quality vs. Sugar Content
 
