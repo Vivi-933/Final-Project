@@ -1,9 +1,10 @@
 ---
-title: "Analysis of salaries of data scientists"
+title: "Analysis of Optimal Growing Conditons of Grapes in Italy"
 author: "Group 12"
-date: "December 1st, 2024"
+date: "December 6th, 2024"
 output: pdf_document
 ---
+
 -   Egbo Joseph (143037470)
 -   Goudy Joshua (169031329)
 -   Thambiaiah Melissa (169060509)
@@ -27,12 +28,11 @@ library(patchwork)}))
 
 # Abstract
 
-The fundamental purpose of this analysis is to determine what cultivation processes of grape cultivation in the ‘grapes’ dataset can maximize the grape quality. In order to achieve this purpose, the goals are as required; the creation of graphical and predictive models in order to fulfill the research question, “How effective is the specific factor’s contribution to the grape quality score?” 
+The fundamental purpose of this analysis is to determine what cultivation processes of grape cultivation in the ‘grapes’ dataset can maximize the grape quality. In order to achieve this purpose, the goals are as required; the creation of graphical and predictive models in order to fulfill the research question, “How effective is the specific factor’s contribution to the grape quality score?”
 
 # Introduction
 
 The Italian Wine Grapes data set provides a comprehensive understanding of cultivation processes pertaining to grapes alongside the relationship that exists with the production of high-quality wine. With a focus on select regions across the heart of Italy, the ‘grapes’ data set captures the essence of varying elements associated with grape cultivation including, region variety, sugar content, quality score, rainfall, and sun exposure over the duration of two months. This report allows individuals to explore the intersections between agriculture, and economics while offering valuable insights into the optimal conditions that yield premium wines. The link between specific factors and their contributions to grape cultivation can be perceived by examining the trends and correlations that prevail from this study.
-
 
 ```{r import}
 grapes_0<-read_csv('GRAPE_QUALITY.csv')
@@ -64,7 +64,7 @@ grapes<-grapes|> mutate(size_category = case_when(
 grapes$size_category<-factor(grapes$size_category, levels = c('small', 'medium', 'large'))
 ```
 
-In order to clean the data for the purpose of making it more comprehensible and effective for analysis, a variable was created to allow for the categorization of red versus white wine. Similarly, cleaning the data entailed the creation of a scale for berry sizes in an attempt to separate the grapes by size into three categories ranging from small, medium and large. Ultimately, the numerical values within the data were organized, corresponding to the relationship that exists between specific variables which possessed the most significant impact in contributing to the quality of the grape. 
+In order to clean the data for the purpose of making it more comprehensible and effective for analysis, a variable was created to allow for the categorization of red versus white wine. Similarly, cleaning the data entailed the creation of a scale for berry sizes in an attempt to separate the grapes by size into three categories ranging from small, medium and large. Ultimately, the numerical values within the data were organized, corresponding to the relationship that exists between specific variables which possessed the most significant impact in contributing to the quality of the grape.
 
 ## Exploratory Table 1: Feature Correlation
 
@@ -79,8 +79,8 @@ generate_correlation_table <- function(data) {
   correlation_matrix <- cor(continuous_vars, use = "complete.obs") 
   correlation_table <- as.data.frame(correlation_matrix) 
   return(correlation_table) }
+# Function Source: Footnote 2
 grapes_woqs<-grapes_train|>select(!(quality_score))
-
 round_table <- function(data, digits = 1) {data %>% mutate(across(everything(),
                                                                    ~ round(.x, digits)))}
 corrs <- generate_correlation_table(grapes_woqs)
@@ -90,9 +90,9 @@ rownames(corrs)<-c('Sugar Content', 'Acidity(PH)', 'Cluster Weight(g)', 'Berry S
 a<-kable(corrs[1:4], col.names=c('Sugar Content','Acidity(PH)', 'Cluster Weight(g)', 
                                  'Berry Size(mm)'), booktabs = FALSE)|> kable_styling()|>
   column_spec(1, width = '8em')|> column_spec(c(2,3,4,5), width = '5em')
-
 b<-kable(corrs[4:7], col.names = c('Sun Hours','Soil Moisture(%)', 'Rainfal(mm)', 
-                              'harvest Week'), booktabs = FALSE)|> kable_styling()|>
+                              'harvest Week'), booktabs = FALSE)|> 
+kable_styling()|>
   column_spec(1, width = '8em')|> column_spec(c(2,3,4,5), width = '5em')
 ```
 
@@ -101,7 +101,7 @@ a
 b
 ```
 
-In the first step of analyzing the data, a table was created to effectively convey the correlation between every individual variable that does not play a role in dictating the quality of the grapes. The reasoning behind the use of correlation relates to the efficiency of determining the strength associated with the relationship between two variables. To build on this, we determine how much A (the target variable) changes concurrently when B (the feature variable) increases by 1, which is how correlation is defined. Conclusively, there is minimal correlation between variables and this is revealed through the variables possessing a generally weak link to each other. 
+In the first step of analyzing the data, a table was created to effectively convey the correlation between every individual variable that does not play a role in dictating the quality of the grapes. The reasoning behind the use of correlation relates to the efficiency of determining the strength associated with the relationship between two variables. To build on this, we determine how much A (the target variable) changes concurrently when B (the feature variable) increases by 1, which is how correlation is defined. Conclusively, there is minimal correlation between variables and this is revealed through the variables possessing a generally weak link to each other.
 
 ## Exploratory Plot 2: Sugar Content by Variety
 
@@ -117,7 +117,7 @@ ggplot(grapes_train)+
        caption = 'Source: see footnote 1')
 ```
 
-In the second step of analyzing the data, the comparison was made between sugar content and the variety of grapes. Fundamentally, sugar is measured in brix, which is defined as one gram of sugar per one hundred gram of grape liquids. From the evident graphical representation of the frequency it is said that the variety of Riesling, Syrah and Zinfandel tend to reveal a comparatively higher sugar content, while varieties such as Merlot and Sauvignon act inversely. 
+In the second step of analyzing the data, the comparison was made between sugar content and the variety of grapes. Fundamentally, sugar is measured in brix, which is defined as one gram of sugar per one hundred gram of grape liquids. From the evident graphical representation of the frequency it is said that the variety of Riesling, Syrah and Zinfandel tend to reveal a comparatively higher sugar content, while varieties such as Merlot and Sauvignon act inversely.
 
 ## Model Plot 2: Quality vs. Sugar Content
 
@@ -134,7 +134,7 @@ ggplot(grapes_train,mapping=aes(x = sugar_content_brix, y = quality_score))+
        colour = 'Sun Exposure Hours')
 ```
 
-Conducting further analysis between sugar content and sun exposure versus the target variable, that being sugar level. From the exploration of relation, it is conclusive that as sugar content in a grape increases, the quality score simultaneously increases. Additionally, as sunlight hours increase in the cultivation of grapes, the quality score is also inclined to increase as well. Apart from this, sugar content and sunlight hours present little to no correlation between one. 
+Conducting further analysis between sugar content and sun exposure versus the target variable, that being sugar level. From the exploration of relation, it is conclusive that as sugar content in a grape increases, the quality score simultaneously increases. Additionally, as sunlight hours increase in the cultivation of grapes, the quality score is also inclined to increase as well. Apart from this, sugar content and sunlight hours present little to no correlation between one.
 
 ## Model Plot 2: Size Category Vs. Wine Type
 
@@ -149,9 +149,9 @@ ggplot(grapes_train, aes(y = size_category, x = quality_score))+
        caption = 'Source: see footnote 1')
 ```
 
-In our final graphical exploration of the data, a comparison between the sugar content against the size of the grapes and the type of wine that the grapes are inclined to produce, is conducted. From the extraction of the data, we can derive that larger grapes tend to enhance the quality score of the grape, while red wine grapes have the tendency to be larger and higher in quality. On the contrary, white wine grapes are smaller on average, while remaining low in quality. 
+In our final graphical exploration of the data, a comparison between the sugar content against the size of the grapes and the type of wine that the grapes are inclined to produce, is conducted. From the extraction of the data, we can derive that larger grapes tend to enhance the quality score of the grape, while red wine grapes have the tendency to be larger and higher in quality. On the contrary, white wine grapes are smaller on average, while remaining low in quality.
 
-## Exploratory Linear Model 2: 
+## Exploratory Linear Model 2:
 
 ```{r, grape_recipe}
 recipe1<-recipe(quality_score ~ sugar_content_brix + size_category + wine_type,
@@ -172,13 +172,10 @@ grapes_workflow_set <- workflow_set(grapes_recipe, models = list(lm = linear_reg
 
 ```{r, grapes_fit}
 set.seed(1000)
-grapes_fit <- workflow_set(
-  grapes_recipe,
+grapes_fit <- workflow_set(grapes_recipe,
   models = list(lm = linear_reg())) |>
   workflow_map(fn = "tune_grid",resamples = validation_set(grapes_split)) 
-grapes_fit |>
-    collect_metrics()|>
-    ggplot() +
+grapes_fit |>collect_metrics()|>ggplot() +
     aes(x = wflow_id, y = mean) +
     geom_col(fill = "lightgrey", colour = "black") +
     facet_wrap(~ .metric, scales = "free")+
@@ -191,14 +188,12 @@ rf <- rand_forest(trees = 1000, mtry = tune(), min_n = 4) |>
     set_engine("randomForest") |>
     set_mode("regression")
 tune_grid <- tibble(mtry = 1:4)
-lm_versus_rf <- workflow_set(
- grapes_recipe,
+lm_versus_rf <- workflow_set(grapes_recipe,
   models = list(lm = linear_reg(), rf = rf)) |>
     workflow_map(fn = "tune_grid",grid = tune_grid,seed = 100,
         control = control_grid(save_pred = TRUE, save_workflow = TRUE),
         resamples = vfold_cv(training(grapes_split), v = 5))
-lm_versus_rf |>
-    autoplot(select_best = TRUE, metric = "rmse") +
+lm_versus_rf |>autoplot(select_best = TRUE, metric = "rmse") +
     geom_label_repel(aes(label = wflow_id))
 ```
 
@@ -223,14 +218,10 @@ grapes_workflow_set_2 <- workflow_set(grapes_recipe_2, models = list(lm = linear
 
 ```{r, grapes_fit_2}
 set.seed(1000)
-grapes_fit_2 <- workflow_set(
-  grapes_recipe_2,
+grapes_fit_2 <- workflow_set(grapes_recipe_2,
   models = list(lm = linear_reg())) |>
   workflow_map(fn = "tune_grid",resamples = validation_set(grapes_split)) 
-grapes_fit_2 |>
-    collect_metrics()|>
-    ggplot() +
-    aes(x = wflow_id, y = mean) +
+grapes_fit_2 |>collect_metrics()|>ggplot() +aes(x = wflow_id, y = mean) +
     geom_col(fill = "lightgrey", colour = "black") +
     facet_wrap(~ .metric, scales = "free")+
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -239,16 +230,11 @@ grapes_fit_2 |>
 ```{r rf2, warning=FALSE}
 train_test <- initial_split(grapes, prop = 0.8)
 rf_2 <- rand_forest(trees = 1000, mtry = tune(), min_n = 3) |>
-    set_engine("randomForest") |>
-    set_mode("regression")
+    set_engine("randomForest") |> set_mode("regression")
 tune_grid_2 <- tibble(mtry = 1:3)
-lm_versus_rf_2 <- workflow_set(
- grapes_recipe_2,
+lm_versus_rf_2 <- workflow_set(grapes_recipe_2,
   models = list(lm = linear_reg(), rf = rf)) |>
-    workflow_map(
-        fn = "tune_grid",
-        grid = tune_grid_2,
-        seed = 100,
+    workflow_map(fn = "tune_grid",grid = tune_grid_2,seed = 100,
         control = control_grid(save_pred = TRUE, save_workflow = TRUE),
         resamples = vfold_cv(training(grapes_split), v = 5))
 lm_versus_rf_2 |>
@@ -309,9 +295,14 @@ From the analysis preformed previously, the quality of grapes has a strong corre
 
 # Conclusions
 
-Conclusively, this study proficiently presents the influence of grape cultivation measurements on the quality of grapes harvested from the heart of Italy. In the exploratory portion of the analysis, it was discovered that there exists a plausible link between sugar content, as well as variety and size, to the quality pertaining to the grapes. Furthermore, this correlation was expanded upon through the utilization of predictive models, the correlation metric, and the RMSE and RSQ of models. Building on this, the greatest correlation obtainable was the sugar content and size to the quality of grapes, identifiable in the final model. This can be logically perceived as these grapes are primarily used in the production of wine, in which comparatively sweeter wines can be extracted in great quantity from grapes that are larger in size and possess higher levels of sweetness. 
+Conclusively, this study proficiently presents the influence of grape cultivation measurements on the quality of grapes harvested from the heart of Italy. In the exploratory portion of the analysis, it was discovered that there exists a plausible link between sugar content, as well as variety and size, to the quality pertaining to the grapes. Furthermore, this correlation was expanded upon through the utilization of predictive models, the correlation metric, and the RMSE and RSQ of models. Building on this, the greatest correlation obtainable was the sugar content and size to the quality of grapes, identifiable in the final model. This can be logically perceived as these grapes are primarily used in the production of wine, in which comparatively sweeter wines can be extracted in great quantity from grapes that are larger in size and possess higher levels of sweetness.
 
 The primary limitation corresponding to this data is associated with the noticeably short time periods within the data set from which the grapes were collected. Moreover, measurements such as pH, soil moisture, and rainfall were ineffectual as they possessed minimal correlation with one another and failed to contribute to the quality of wine grapes. Ultimately, this analysis offers valuable insights into the influential relationships that lie within the cultivation of grapes.
 
+[^1]
 
-^[Vishal. (2024). Grape Quality [Data set]. Kaggle. <https://doi.org/10.34740/KAGGLE/DSV/9781093>]
+[^1]: Vishal. (2024). Grape Quality [Data set]. Kaggle. <https://doi.org/10.34740/KAGGLE/DSV/9781093>
+
+[^2]
+
+[^2]: OpenAI. (2024). ChatGPT (Dec 4 version) [Large language model]. <https://chat.openai.com/>
