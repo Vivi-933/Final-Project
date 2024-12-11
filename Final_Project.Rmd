@@ -242,7 +242,7 @@ lm_versus_rf_2 |>
     geom_label_repel(aes(label = wflow_id))
 ```
 
-The secondary predictive model, instead uses the amount of sunlight the grapes receive, their respective region and the specific variety of grapes to determine the quality of the grapes. In the analysis, three variations of the features were used to identify which combination had the strongest effect on the overall quality of the grapes. From the secondary analysis, it can be determined that using the amount of sun exposure and variety creates the best overall model, indicating the region of grapes is not necessary in predicting the quality of the grapes.
+The secondary predictive model, instead uses the amount of sunlight the grapes receive, their respective region and the specific variety to determine the quality of the grapes. In the analysis, three variations of the features were used to identify which combination of respective region and variety had the strongest effect on the overall quality of the grapes. From the secondary analysis, it can be determined that using the amount of sun exposure and variety creates the best overall model, indicating the region of grapes is not necessary in predicting the quality of the grapes.
 
 # Final Model:
 
@@ -291,11 +291,11 @@ bar<-bind_rows(
 bar + point
 ```
 
-From the analysis preformed previously, the quality of grapes has a strong correlation to the sugar amount and the size of the grape. This can be seen in the rank of the model, the rsme value and the rsq value.
+From the analysis preformed previously, the quality of grapes has a strong correlation to the sugar amount and the size of the grape. This can be seen in the rank of the model, the large rsme value and the large rsq value.
 
 # Conclusions
 
-Conclusively, this study proficiently presents the influence of grape cultivation measurements on the quality of grapes harvested from the heart of Italy. In the exploratory portion of the analysis, it was discovered that there exists a plausible link between sugar content, as well as variety and size, to the quality pertaining to the grapes. Furthermore, this correlation was expanded upon through the utilization of predictive models, the correlation metric, and the RMSE and RSQ of models. Building on this, the greatest correlation obtainable was the sugar content and size to the quality of grapes, identifiable in the final model. This can be logically perceived as these grapes are primarily used in the production of wine, in which comparatively sweeter wines can be extracted in great quantity from grapes that are larger in size and possess higher levels of sweetness.
+Conclusively, this study proficiently presents the influence of grape cultivation measurements on the quality of grapes harvested from the heart of Italy. In the exploratory portion of the analysis, it was discovered that there exists a plausible link between sugar content, as well as variety and size, to the quality pertaining to the grapes. Furthermore, this correlation was expanded upon through the utilization of predictive models, the correlation metric, and the RMSE and RSQ of models. Building on this, the greatest correlation obtained to the target variable was using the sugar content and size of grapes, identifiable in the final model. This can be logically perceived as these grapes are primarily used in the production of wine, in which comparatively sweeter wines can be extracted in great quantity from grapes that are larger in size and possess higher levels of sweetness.
 
 The primary limitation corresponding to this data is associated with the noticeably short time periods within the data set from which the grapes were collected. Moreover, measurements such as pH, soil moisture, and rainfall were ineffectual as they possessed minimal correlation with one another and failed to contribute to the quality of wine grapes. Ultimately, this analysis offers valuable insights into the influential relationships that lie within the cultivation of grapes.
 
