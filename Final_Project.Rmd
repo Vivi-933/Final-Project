@@ -291,7 +291,7 @@ bar<-bind_rows(
 bar + point
 ```
 
-From the analysis preformed previously, the quality of grapes has a strong correlation to the sugar amount and the size of the grape. This can be seen in the rank of the model, the large rsme value and the large rsq value.
+From the analysis preformed previously, the quality of grapes has a strong correlation to the sugar amount and the size of the grape. This can be seen in the rank of the model, the large RSME value and the large RSQ value.
 
 # Conclusions
 
