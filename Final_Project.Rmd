@@ -151,7 +151,7 @@ ggplot(grapes_train, aes(y = size_category, x = quality_score))+
 
 In our final graphical exploration of the data, a comparison is conducted between the sugar content against the size of the grapes and the type of wine that the grapes are inclined to produce. From the extraction of the data, we can derive that larger grapes tend to enhance the quality score of the grape, while red wine grapes have the tendency to be larger and higher in quality. On the contrary, white wine grapes are smaller on average, while remaining low in quality.
 
-## Exploratory Linear Model 2:
+## Exploratory Linear Model 1:
 
 ```{r, grape_recipe}
 recipe1<-recipe(quality_score ~ sugar_content_brix + size_category + wine_type,
